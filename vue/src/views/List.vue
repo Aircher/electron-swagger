@@ -1,16 +1,15 @@
 <template>
   <div class="list-page">
-    <Tabs>
-      <TabPane v-for="(item,index) in swaggerConfig" :label="item.name" :key="index"></TabPane>
-    </Tabs>
-    <div>
-      <Collapse simple v-for="(property,index) in Object.keys(swaggerApiGroupList)" :key="index">
+    <Tabs @on-click="changeSwaggerTab">
+      <TabPane v-for="(item,index) in swaggerConfig" :label="item.name" :key="index">
+        <div v-if="item.swaggerApiGroupList" class="swagger-container">
+          <Collapse simple v-for="(property,index) in Object.keys(item.swaggerApiGroupList)" :key="index">
         <Panel :name="property">
-          {{property}} <i class="iconfont iconcopy"></i>
+          {{property}} <i class="iconfont iconcopy" @click.stop="mutipleCopyRequestCode(item.swaggerApiGroupList[property])"></i>
           <div slot="content">
-            <Collapse simple v-for="(item,index) in swaggerApiGroupList[property]" :key="index">
+            <Collapse simple v-for="(item,index) in item.swaggerApiGroupList[property]" :key="index">
               <Panel :name="item.url">
-                {{item.url}} {{item.summary}} <i class="iconfont iconcopy"></i>
+                {{item.url}} {{item.summary}} <i class="iconfont iconcopy" @click.stop="copyRequestCode(item)"></i>
                 <p slot="content">
                   <pre v-html="item.requestCode" class="code-content">
                   </pre>
@@ -20,36 +19,37 @@
           </div>
         </Panel>
       </Collapse>
+        </div>
+      </TabPane>
+    </Tabs>
+    <div>
+
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import http from '../utils/http'
 import _ from 'loadsh'
+import { copy } from '../utils'
 export default {
   name: '',
   data () {
     return {
       swaggerApiList: [],
       swaggerApiGroupList: {},
-      swaggerConfigDetail: null
+      swaggerConfigDetail: null,
+      swaggerConfig: []
     }
   },
-  created () {
-    this.getSwaggerApiData(this.swaggerConfig[0].apiUrl)
-  },
-  computed: {
-    ...mapState({
-      swaggerConfig: state => state.app.swaggerConfig
-    })
+  mounted () {
+    this.swaggerConfig = this.$store.state.app.swaggerConfig
+    this.getSwaggerApiData(this.swaggerConfig[0])
   },
   methods: {
-    getSwaggerApiData (url) {
-      http.get(url).then(res => {
+    getSwaggerApiData (swagger) {
+      http.get(swagger.apiUrl).then(res => {
         this.swaggerConfigDetail = res
-        console.log(res)
         if (res.paths) {
           let apiList = []
           Object.keys(res.paths).forEach(key => {
@@ -85,7 +85,7 @@ export default {
                         export const ${funcName}= (${requestParams.length > 0 ? requestParams.join(',') : null})=> { 
                             return  request({ 
                                 url:'${key}', 
-                                method:'${curItem.method}', 
+                                method: ${type}, 
                                 ${haveQueryParams ? 'params: params' : ''}
                                 ${haveBodyParams ? 'data: data' : ''}
                             }) 
@@ -106,11 +106,29 @@ export default {
               }
             })
           })
-          this.swaggerApiList = apiList
-          this.swaggerApiGroupList = _.groupBy(apiList, 'tag')
-          console.log(this.swaggerApiGroupList)
+          this.$set(swagger, 'swaggerApiGroupList', _.groupBy(apiList, 'tag'))
+          this.$set(swagger, 'swaggerApiList', apiList)
         }
       })
+    },
+    // 获取分组下的代码
+    mutipleCopyRequestCode (group) {
+      if (group.length > 0) {
+        let codes = group.map(item => item.requestCode).join('\n\n')
+        copy(codes)
+        this.$Message.success('拷贝成功')
+      }
+    },
+    // 单个拷贝
+    copyRequestCode (item) {
+      copy(item.requestCode)
+      this.$Message.success('复制成功')
+    },
+    changeSwaggerTab (index) {
+      const curSwagger = this.swaggerConfig[index]
+      if (!curSwagger.swaggerApiGroupList) {
+        this.getSwaggerApiData(curSwagger)
+      }
     }
   }
 }
@@ -133,6 +151,10 @@ export default {
   }
   .panel-header{
     padding-left: 20px;
+  }
+  .swagger-container{
+    height: calc(100vh - 60px);
+    overflow: auto;
   }
 }
 </style>
