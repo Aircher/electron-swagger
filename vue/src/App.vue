@@ -1,62 +1,80 @@
 <template>
   <div id="app">
     <div class="home-bar">
-      <i class="iconfont iconhome" @click="goto('/')"></i>
-      <i class="iconfont iconlist" @click="goto('/list')"></i>
-      <i class="iconfont iconshezhi1" @click="goto('/swaggerconfig')"></i>
+      <div class="icons">
+        <router-link to="/">
+          <Icon type="md-add" />
+        </router-link>
+        <router-link to="/list" v-show="swaggerConfig.length>0">
+          <Icon type="ios-apps" />
+        </router-link>
+        <router-link to="/swaggerconfig">
+          <Icon type="md-settings" />
+        </router-link>
+      </div>
     </div>
     <div class="layout-content">
-      <router-view class="routerview"/>
+      <router-view class="routerview" />
     </div>
   </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
   methods: {
     goto (path) {
       this.$router.push(path)
     }
+  },
+  computed: {
+    ...mapState({
+      swaggerConfig: state => state.app.swaggerConfig
+    })
   }
 }
 </script>
 <style lang="less" scoped>
-#app{
+#app {
   height: 100vh;
   width: 100vw;
   position: relative;
   display: flex;
-  .home-bar{
+  .home-bar {
     width: 60px;
     background-color: black;
     text-align: center;
     padding-top: 20px;
     position: relative;
-    .iconfont{
-      display: block;
-      font-size: 20px;
-      color: #eeeeee;
-      margin-bottom: 20px;
-      cursor: pointer;
-      &:hover{
-        color: gray;
-      }
-      &:active{
-        color: dodgerblue;
-      }
-      &.iconshezhi1{
-        position: absolute;
-        bottom: 10px;
-        left: 50%;
-        transform: translateX(-50%);
+    .icons {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+      text-align: center;
+      a {
+        display: block;
+        font-size: 25px;
+        color: #eeeeee;
+        margin-bottom: 40px;
+        &:last-of-type {
+          margin-bottom: 0;
+        }
+        cursor: pointer;
+        &:hover {
+          color: gray;
+        }
+        &.router-link-exact-active{
+          color: dodgerblue;
+        }
       }
     }
   }
-  .layout-content{
+  .layout-content {
     flex: 1 auto;
     height: 100%;
     overflow: hidden;
     padding: 20px;
-    .routerview{
+    .routerview {
       height: 100%;
       background-color: white;
       padding: 20px;

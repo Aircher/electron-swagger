@@ -17,6 +17,10 @@ const mutations = {
   deleteSwaggerConfig (state, index) {
     state.swaggerConfig.splice(index, 1)
     saveSwaggerConfig(state.swaggerConfig)
+  },
+  updateSwaggerConfig (state, config) {
+    state.swaggerConfig = config
+    saveSwaggerConfig(state.swaggerConfig)
   }
 }
 

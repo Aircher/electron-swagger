@@ -3,6 +3,9 @@
     <Tabs @on-click="changeSwaggerTab">
       <TabPane v-for="(item,index) in swaggerConfig" :label="item.name" :key="index">
         <div v-if="item.swaggerApiGroupList" class="swagger-container">
+          <div class="swagger-website">
+            <strong>swagger地址:</strong><a :href="item.swaggerWebsite" target="_blank">{{item.swaggerWebsite}}</a>
+          </div>
           <Collapse
             simple
             v-for="(property,index) in Object.keys(item.swaggerApiGroupList)"
@@ -10,10 +13,7 @@
           >
             <Panel :name="property">
               {{property}}
-              <i
-                class="iconfont iconcopy"
-                @click.stop="mutipleCopyRequestCode(item.swaggerApiGroupList[property])"
-              ></i>
+              <Icon type="md-copy"  @click.stop="mutipleCopyRequestCode(item.swaggerApiGroupList[property])" />
               <div slot="content">
                 <Collapse
                   simple
@@ -22,10 +22,7 @@
                 >
                   <Panel :name="item.url">
                     {{item.url}} {{item.summary}}
-                    <i
-                      class="iconfont iconcopy"
-                      @click.stop="copyRequestCode(item)"
-                    ></i>
+                    <Icon type="md-copy"  @click.stop="copyRequestCode(item)" />
                     <div slot="content">
                       <pre v-html="item.requestCode" class="code-content"></pre>
                     </div>
@@ -56,7 +53,7 @@ export default {
     }
   },
   mounted () {
-    this.swaggerConfig = this.$store.state.app.swaggerConfig
+    this.swaggerConfig = _.cloneDeep(this.$store.state.app.swaggerConfig)
     this.getSwaggerApiData(this.swaggerConfig[0])
   },
   methods: {
@@ -101,7 +98,7 @@ export default {
                   requestCode = `
                         ${curItem.summary ? '//' + curItem.summary : ''} 
                         export const ${funcName}= (${
-  requestParams.length > 0 ? requestParams.join(',') : null
+  requestParams.length > 0 ? requestParams.join(',') : ''
 })=> { 
                             return  request({ 
                                 url:'${key}', 
@@ -137,7 +134,7 @@ export default {
     // 获取分组下的代码
     mutipleCopyRequestCode (group) {
       if (group.length > 0) {
-        let codes = group.map(item => item.requestCode).join('\n\n')
+        let codes = group.map(item => item.requestCode).join('\n')
         copy(codes)
         this.$Message.success('拷贝成功')
       }
@@ -166,11 +163,13 @@ export default {
     text-align: left;
     cursor: pointer;
   }
-  .iconcopy {
+  .ivu-icon-md-copy {
     position: absolute;
-    bottom: 0px;
+    bottom: 4px;
     right: 20px;
+    font-size: 20px;
     z-index: 1;
+    transform: none !important;
   }
   .panel-header {
     padding-left: 20px;
@@ -179,6 +178,12 @@ export default {
     height: calc(100vh - 150px);
     width: 100%;
     overflow: auto;
+    .swagger-website{
+      margin-bottom: 10px;
+      strong{
+        margin-right: 10px;
+      }
+    }
   }
 }
 </style>
