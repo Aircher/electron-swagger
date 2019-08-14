@@ -88,14 +88,7 @@ export default {
     })
   },
   methods: {
-    ...mapMutations('app', ['deleteSwaggerConfig', 'updateSwaggerConfig'])
-  },
-  watch: {
-    configModalVisible (val) {
-      if (val) {
-        this.swaggerJson = JSON.stringify(this.swaggerConfig)
-      }
-    },
+    ...mapMutations('app', ['deleteSwaggerConfig', 'updateSwaggerConfig']),
     onUpdateSwaggerConfig () {
       if (this.swaggerJson) {
         try {
@@ -121,6 +114,13 @@ export default {
         }
       } else {
         this.$message.error('请输入swagger配置')
+      }
+    }
+  },
+  watch: {
+    configModalVisible (val) {
+      if (val) {
+        this.swaggerJson = JSON.stringify(this.swaggerConfig)
       }
     }
   }

@@ -8,7 +8,7 @@
         <router-link to="/list" v-show="swaggerConfig.length>0">
           <Icon type="ios-apps" />
         </router-link>
-        <router-link to="/swaggerconfig" v-show="swaggerConfig.length>0">
+        <router-link to="/swaggerconfig">
           <Icon type="md-settings" />
         </router-link>
       </div>
@@ -39,12 +39,14 @@ export default {
   width: 100vw;
   position: relative;
   display: flex;
+  flex-flow:row;
   .home-bar {
     width: 60px;
     background-color: black;
     text-align: center;
     padding-top: 20px;
     position: relative;
+    height: 100%;
     .icons {
       position: absolute;
       top: 50%;
@@ -70,10 +72,10 @@ export default {
     }
   }
   .layout-content {
-    flex: 1 auto;
     height: 100%;
     overflow: hidden;
     padding: 20px;
+    flex: 1;
     .routerview {
       height: 100%;
       background-color: white;
