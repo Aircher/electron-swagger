@@ -39,6 +39,7 @@ export default {
     onSave () {
       this.addSwaggerConfig(this.addForm)
       this.showAddModal = false
+      this.addForm = {}
     },
     gotoList () {
       this.$router.push('/list')

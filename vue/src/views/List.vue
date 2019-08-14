@@ -72,16 +72,18 @@ export default {
               let curItem = path[type]
               if (curItem) {
                 let requestCode = ''
-                let funcName = mutipleRequest
-                  ? `${key.split('/').pop()}_${type}`
-                  : key.split('/').pop()
+                // 取url最后一个字段当做方法名。注意排除pathParam
+                let funcName = key.split('/').filter(x => !x.startsWith('{')).pop()
+                // 如果同一个链接有多个请求就在名字后面加上请求类型
+                if (mutipleRequest) {
+                  funcName = `${funcName}_${type}`
+                }
                 curItem.parameters = curItem.parameters || []
                 if (curItem.parameters.findIndex(x => x.in === 'path')) {
                   let requestParams = []
                   let pathParams = curItem.parameters
                     .filter(x => x.in === 'path')
                     .map(x => x.name)
-                    .join(',')
                   let haveQueryParams =
                     curItem.parameters.findIndex(x => x.in === 'query') >= 0
                   let haveBodyParams =
@@ -95,14 +97,21 @@ export default {
                   if (haveBodyParams) {
                     requestParams.push('data')
                   }
+
+                  // 默认链接就是key
+                  let requestUrl = `'${key}'`
+                  // 如果链接里面包含参数就是用字符串模板会将xxx/{sysno}转换成xxx/${sysno}
+                  if (pathParams.length > 0) {
+                    requestUrl = `\`${key.replace(/\/{/g, '/${')}\``
+                  }
                   requestCode = `
                       ${curItem.summary ? '//' + curItem.summary : ''} 
                       export const ${funcName}= (${
   requestParams.length > 0 ? requestParams.join(',') : ''
 })=> { 
                           return  request({ 
-                            url:'${key}', 
-                            method: ${type},
+                            url: ${requestUrl}, 
+                            method: '${type}',
                             ${haveQueryParams ? 'params: params' : ''}
                             ${haveBodyParams ? 'data: data' : ''}
                           }) 
