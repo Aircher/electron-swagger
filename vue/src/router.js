@@ -15,6 +15,11 @@ export default new Router({
       path: '/list',
       name: 'list-page',
       component: () => import('./views/List.vue')
+    },
+    {
+      path: '/swaggerconfig',
+      name: 'swaggerconfig-page',
+      component: () => import('./views/SwaggerConfig.vue')
     }
   ]
 })

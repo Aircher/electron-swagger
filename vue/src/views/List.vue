@@ -3,28 +3,41 @@
     <Tabs @on-click="changeSwaggerTab">
       <TabPane v-for="(item,index) in swaggerConfig" :label="item.name" :key="index">
         <div v-if="item.swaggerApiGroupList" class="swagger-container">
-          <Collapse simple v-for="(property,index) in Object.keys(item.swaggerApiGroupList)" :key="index">
-        <Panel :name="property">
-          {{property}} <i class="iconfont iconcopy" @click.stop="mutipleCopyRequestCode(item.swaggerApiGroupList[property])"></i>
-          <div slot="content">
-            <Collapse simple v-for="(item,index) in item.swaggerApiGroupList[property]" :key="index">
-              <Panel :name="item.url">
-                {{item.url}} {{item.summary}} <i class="iconfont iconcopy" @click.stop="copyRequestCode(item)"></i>
-                <p slot="content">
-                  <pre v-html="item.requestCode" class="code-content">
-                  </pre>
-                </p>
-              </Panel>
-            </Collapse>
-          </div>
-        </Panel>
-      </Collapse>
+          <Collapse
+            simple
+            v-for="(property,index) in Object.keys(item.swaggerApiGroupList)"
+            :key="index"
+          >
+            <Panel :name="property">
+              {{property}}
+              <i
+                class="iconfont iconcopy"
+                @click.stop="mutipleCopyRequestCode(item.swaggerApiGroupList[property])"
+              ></i>
+              <div slot="content">
+                <Collapse
+                  simple
+                  v-for="(item,index) in item.swaggerApiGroupList[property]"
+                  :key="index"
+                >
+                  <Panel :name="item.url">
+                    {{item.url}} {{item.summary}}
+                    <i
+                      class="iconfont iconcopy"
+                      @click.stop="copyRequestCode(item)"
+                    ></i>
+                    <div slot="content">
+                      <pre v-html="item.requestCode" class="code-content"></pre>
+                    </div>
+                  </Panel>
+                </Collapse>
+              </div>
+            </Panel>
+          </Collapse>
         </div>
       </TabPane>
     </Tabs>
-    <div>
-
-    </div>
+    <div></div>
   </div>
 </template>
 
@@ -68,9 +81,14 @@ export default {
                 curItem.parameters = curItem.parameters || []
                 if (curItem.parameters.findIndex(x => x.in === 'path')) {
                   let requestParams = []
-                  let pathParams = curItem.parameters.filter(x => x.in === 'path').map(x => x.name).join(',')
-                  let haveQueryParams = curItem.parameters.findIndex(x => x.in === 'query') >= 0
-                  let haveBodyParams = curItem.parameters.findIndex(x => x.in === 'body') >= 0
+                  let pathParams = curItem.parameters
+                    .filter(x => x.in === 'path')
+                    .map(x => x.name)
+                    .join(',')
+                  let haveQueryParams =
+                    curItem.parameters.findIndex(x => x.in === 'query') >= 0
+                  let haveBodyParams =
+                    curItem.parameters.findIndex(x => x.in === 'body') >= 0
                   if (pathParams.length > 0) {
                     requestParams.push(...pathParams)
                   }
@@ -82,7 +100,9 @@ export default {
                   }
                   requestCode = `
                         ${curItem.summary ? '//' + curItem.summary : ''} 
-                        export const ${funcName}= (${requestParams.length > 0 ? requestParams.join(',') : null})=> { 
+                        export const ${funcName}= (${
+  requestParams.length > 0 ? requestParams.join(',') : null
+})=> { 
                             return  request({ 
                                 url:'${key}', 
                                 method: ${type}, 
@@ -92,9 +112,12 @@ export default {
                         }`.replace(/\n(\n)*( )*(\n)*\n/g, '\n')
 
                   // 去掉每一行前面的空格
-                  requestCode = requestCode.split('\n').map(item => {
-                    return item.replace('                     ', '')
-                  }).join('\n')
+                  requestCode = requestCode
+                    .split('\n')
+                    .map(item => {
+                      return item.replace('                     ', '')
+                    })
+                    .join('\n')
                 }
                 apiList.push({
                   tag: path[type].tags[0],
@@ -139,21 +162,22 @@ export default {
   .ivu-collapse-header {
     text-align: left;
   }
-  .code-content{
+  .code-content {
     text-align: left;
     cursor: pointer;
   }
-  .iconcopy{
+  .iconcopy {
     position: absolute;
     bottom: 0px;
     right: 20px;
     z-index: 1;
   }
-  .panel-header{
+  .panel-header {
     padding-left: 20px;
   }
-  .swagger-container{
-    height: calc(100vh - 60px);
+  .swagger-container {
+    height: calc(100vh - 150px);
+    width: 100%;
     overflow: auto;
   }
 }

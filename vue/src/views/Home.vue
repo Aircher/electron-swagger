@@ -1,12 +1,7 @@
 <template>
-  <div class="home">
-    <div class="cards">
-      <div class="card" @click="toggleAddModal">
-        <Icon type="md-add" />
-      </div>
-      <div class="card" @click="gotoList">
-        <Icon type="md-apps" />
-      </div>
+  <div class="home-page">
+    <div class="card" @click="toggleAddModal">
+      <Icon type="md-add" />
     </div>
     <Modal v-model="showAddModal" title="添加swagger配置" @on-ok="onSave">
       <Form ref="addForm" autocomplete="off" :model="addForm" :label-width="120">
@@ -52,24 +47,25 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@cardSize : 100px;
-.cards {
+@cardSize : 150px;
+.home-page {
+  position: relative;
   width: 100%;
-  height: @cardSize;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  text-align: center;
+  height: 100%;
   .card {
-    display: inline-block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%;-50%);
     height: @cardSize;
+    text-align: center;
     width: @cardSize;
     border: 1px solid rgba(196, 196, 196, 0.22);
     box-shadow: 0px 14px 30px 0px rgba(164, 164, 164, 0.17);
     line-height: @cardSize;
     margin: 0 10px;
     cursor: pointer;
-    font-size: 30px;
+    font-size: 50px;
     color: #eeeeee;
     border-radius: 10px;
   }
