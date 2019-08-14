@@ -96,18 +96,17 @@ export default {
                     requestParams.push('data')
                   }
                   requestCode = `
-                        ${curItem.summary ? '//' + curItem.summary : ''} 
-                        export const ${funcName}= (${
+                      ${curItem.summary ? '//' + curItem.summary : ''} 
+                      export const ${funcName}= (${
   requestParams.length > 0 ? requestParams.join(',') : ''
 })=> { 
-                            return  request({ 
-                                url:'${key}', 
-                                method: ${type}, 
-                                ${haveQueryParams ? 'params: params' : ''}
-                                ${haveBodyParams ? 'data: data' : ''}
-                            }) 
-                        }`.replace(/\n(\n)*( )*(\n)*\n/g, '\n')
-
+                          return  request({ 
+                            url:'${key}', 
+                            method: ${type},
+                            ${haveQueryParams ? 'params: params' : ''}
+                            ${haveBodyParams ? 'data: data' : ''}
+                          }) 
+                      }`.split('\n').filter(x => x.trim().length > 0).join('\n')
                   // 去掉每一行前面的空格
                   requestCode = requestCode
                     .split('\n')

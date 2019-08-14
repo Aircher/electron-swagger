@@ -2,6 +2,7 @@
   <div class="home-page">
     <div class="card" @click="toggleAddModal">
       <Icon type="md-add" />
+      <div style="font-size:16px;line-height:40px;color:#c4c4c4;">添加swagger配置</div>
     </div>
     <Modal v-model="showAddModal" title="添加swagger配置" @on-ok="onSave">
       <Form ref="addForm" autocomplete="off" :model="addForm" :label-width="120">

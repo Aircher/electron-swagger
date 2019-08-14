@@ -1,6 +1,80 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const electron = require('electron');
+const {app, BrowserWindow, Menu} = require('electron')
 const path = require('path')
+
+let template = [{
+  label: '查看',
+  submenu: [{
+    label: '刷新',
+    accelerator: 'CmdOrCtrl+R',
+    click: function (item, focusedWindow) {
+      if (focusedWindow) {
+        // 重载之后, 刷新并关闭所有的次要窗体
+        if (focusedWindow.id === 1) {
+          BrowserWindow.getAllWindows().forEach(function (win) {
+            if (win.id > 1) {
+              win.close()
+            }
+          })
+        }
+        focusedWindow.reload()
+      }
+    }
+  }, {
+    label: '切换全屏',
+    accelerator: (function () {
+      if (process.platform === 'darwin') {
+        return 'Ctrl+Command+F'
+      } else {
+        return 'F11'
+      }
+    })(),
+    click: function (item, focusedWindow) {
+      if (focusedWindow) {
+        focusedWindow.setFullScreen(!focusedWindow.isFullScreen())
+      }
+    }
+  }, {
+    label: '切换开发者工具',
+    accelerator: (function () {
+      if (process.platform === 'darwin') {
+        return 'Alt+Command+I'
+      } else {
+        return 'Ctrl+Shift+I'
+      }
+    })(),
+    click: function (item, focusedWindow) {
+      if (focusedWindow) {
+        focusedWindow.toggleDevTools()
+      }
+    }
+  }, {
+    type: 'separator'
+  }]
+}, {
+  label: '窗口',
+  role: 'window',
+  submenu: [{
+    label: '最小化',
+    accelerator: 'CmdOrCtrl+M',
+    role: 'minimize'
+  }, {
+    label: '关闭',
+    accelerator: 'CmdOrCtrl+W',
+    role: 'close'
+  }, {
+    type: 'separator'
+  }]
+}, {
+  label: '关于我',
+  submenu: [{
+    label: 'github',
+    click: function () {
+      electron.shell.openExternal('https://github.com/FourLeafClover/elctron-swagger')
+    }
+  }]
+}]
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -11,6 +85,8 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    minWidth: 800,
+    minHeight: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
@@ -34,7 +110,10 @@ function createWindow () {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', function () {
+  createWindow()
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template))
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {

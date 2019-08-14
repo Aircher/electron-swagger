@@ -2,13 +2,13 @@
   <div id="app">
     <div class="home-bar">
       <div class="icons">
-        <router-link to="/">
+        <router-link to="/add">
           <Icon type="md-add" />
         </router-link>
         <router-link to="/list" v-show="swaggerConfig.length>0">
           <Icon type="ios-apps" />
         </router-link>
-        <router-link to="/swaggerconfig">
+        <router-link to="/swaggerconfig" v-show="swaggerConfig.length>0">
           <Icon type="md-settings" />
         </router-link>
       </div>

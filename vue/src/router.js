@@ -4,10 +4,14 @@ import Home from './views/Home.vue'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
+      redirect: '/list'
+    },
+    {
+      path: '/add',
       name: 'home-page',
       component: Home
     },
@@ -23,3 +27,17 @@ export default new Router({
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.path === '/') {
+    if (this.$store.state.app.swaggerConfig.length === 0) {
+      next('/add')
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+})
+
+export default router
