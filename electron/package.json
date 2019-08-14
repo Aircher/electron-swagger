@@ -1,0 +1,24 @@
+{
+  "name": "electron-swagger",
+  "version": "1.0.0",
+  "description": "electron的swagger解析器",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager ./ electron.swagger --overwrite --win --icon=./favicon.ico"
+  },
+  "repository": "https://github.com/electron/electron-quick-start",
+  "keywords": [
+    "DDD",
+    "quick",
+    "start",
+    "tutorial",
+    "swagger"
+  ],
+  "author": "frank zhang",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "6.0.1",
+    "electron-packager": "^14.0.4"
+  }
+}
