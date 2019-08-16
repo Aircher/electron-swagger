@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './views/Home.vue'
 import store from '@/store/index'
+import { Notice } from 'iview'
 
 Vue.use(Router)
 
@@ -10,11 +10,6 @@ const router = new Router({
     {
       path: '/',
       redirect: '/list'
-    },
-    {
-      path: '/add',
-      name: 'home-page',
-      component: Home
     },
     {
       path: '/list',
@@ -32,7 +27,12 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   if (to.path === '/list') {
     if (store.state.app.swaggerConfig.length === 0) {
-      next('/add')
+      Notice.info({
+        title: '温馨提示',
+        desc: '您还未添加任何swagger配置,请添加swagger配置。',
+        duration: 2
+      })
+      next('/swaggerconfig')
     } else {
       next()
     }

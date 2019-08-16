@@ -109,7 +109,7 @@ export default {
                       export const ${funcName}= (${
   requestParams.length > 0 ? requestParams.join(',') : ''
 })=> { 
-                          return  request({ 
+                          return request({ 
                             url: ${requestUrl}, 
                             method: '${type}',
                             ${haveQueryParams ? 'params: params' : ''}
