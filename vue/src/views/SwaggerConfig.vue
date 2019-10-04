@@ -4,7 +4,7 @@
       <Button @click="toggleAddModal">添加Swagger配置</Button>
       <Button class="primary" @click="configModalVisible=true">编辑配置</Button>
     </div>
-    <Table height="200" :columns="columns" :data="this.swaggerConfig"></Table>
+    <Table :columns="columns" :data="this.swaggerConfig"></Table>
     <Modal @on-ok="onUpdateSwaggerConfig" v-model="configModalVisible" title="swagger配置">
       <div class="tip">swagger配置必须是有效的数组json字符串,包含apiUrl,swaggerWebsite,name三个字段且不能为空</div>
       <Input v-model="swaggerJson" :autosize="{ maxRows:10 }" type="textarea" placeholder />
@@ -33,6 +33,7 @@ export default {
     return {
       showAddModal: false,
       addForm: {},
+      editFormIndex: '',
       columns: [
         {
           title: '名称',
@@ -75,21 +76,39 @@ export default {
           width: 150,
           align: 'center',
           render: (h, params) => {
-            return h(
-              'Button',
-              {
-                props: {
-                  type: 'error',
-                  size: 'small'
-                },
-                on: {
-                  click: () => {
-                    this.deleteSwaggerConfig(params.index)
+            return h('div', [
+              h('Button',
+                {
+                  props: {
+                    type: 'error',
+                    size: 'small'
+                  },
+                  on: {
+                    click: () => {
+                      this.deleteSwaggerConfig(params.index)
+                    }
                   }
-                }
-              },
-              '删除'
-            )
+                },
+                '删除'),
+              h('Button',
+                {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  style: {
+                    'margin-left': '10px'
+                  },
+                  on: {
+                    click: () => {
+                      this.addForm = params.row
+                      this.editFormIndex = params.index
+                      this.showAddModal = true
+                    }
+                  }
+                },
+                '编辑')
+            ])
           }
         }
       ],
@@ -133,13 +152,21 @@ export default {
       }
     },
     toggleAddModal () {
+      this.addForm = {}
       this.showAddModal = !this.showAddModal
     },
     ...mapMutations('app', ['addSwaggerConfig']),
     onSave () {
-      this.addSwaggerConfig(this.addForm)
-      this.showAddModal = false
-      this.addForm = {}
+      if (this.editFormIndex) {
+        this.updateSingleSwaggerConfig({
+          data: this.addForm,
+          index: this.editFormIndex
+        })
+      } else {
+        this.addSwaggerConfig(this.addForm)
+        this.showAddModal = false
+        this.addForm = {}
+      }
     }
   },
   watch: {
@@ -154,6 +181,7 @@ export default {
 
 <style lang="less" scoped>
 .swagger-config-page {
+  overflow: auto;
   .btns {
     text-align: right;
     padding: 20px 0px;

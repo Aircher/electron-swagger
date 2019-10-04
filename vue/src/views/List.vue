@@ -1,55 +1,34 @@
 <template>
   <div class="list-page">
-    <Tabs @on-click="changeSwaggerTab">
-      <TabPane v-for="(item,index) in swaggerConfig" :label="item.name" :key="index">
-        <div v-if="item.swaggerApiGroupList" class="swagger-container">
-          <div class="swagger-website">
-            <strong>swagger地址:</strong><a :href="item.swaggerWebsite" target="_blank">{{item.swaggerWebsite}}</a>
-          </div>
-          <Collapse
-            simple
-            v-for="(property,index) in Object.keys(item.swaggerApiGroupList)"
-            :key="index"
-          >
-            <Panel :name="property">
-              {{property}}
-              <Icon type="md-copy"  @click.stop="mutipleCopyRequestCode(item.swaggerApiGroupList[property])" />
-              <div slot="content">
-                <Collapse
-                  simple
-                  v-for="(item,index) in item.swaggerApiGroupList[property]"
-                  :key="index"
-                >
-                  <Panel :name="item.url">
-                    {{item.url}} {{item.summary}}
-                    <Icon type="md-copy"  @click.stop="copyRequestCode(item)" />
-                    <div slot="content">
-                      <pre v-html="item.requestCode" class="code-content"></pre>
-                    </div>
-                  </Panel>
-                </Collapse>
-              </div>
-            </Panel>
-          </Collapse>
-        </div>
-      </TabPane>
-    </Tabs>
-    <div></div>
+    <VerticalTabs @on-click="changeSwaggerTab">
+      <VerticalTabPanel v-for="(item,index) in swaggerConfig" :label="item.name" :key="index">
+        <CodePanel :item="item" />
+        <Spin size="large" v-if="item.loading"></Spin>
+      </VerticalTabPanel>
+    </VerticalTabs>
   </div>
 </template>
 
 <script>
-import http from '../utils/http'
+import http from '@/utils/http'
 import _ from 'loadsh'
-import { copy } from '../utils'
+import CodePanel from '@/components/Code/index'
+import VerticalTabs from '@/components/VerticalTabs/VerticalTabs'
+import VerticalTabPanel from '@/components/VerticalTabs/VerticalTabPanel'
 export default {
   name: '',
+  components: {
+    CodePanel,
+    VerticalTabs,
+    VerticalTabPanel
+  },
   data () {
     return {
       swaggerApiList: [],
       swaggerApiGroupList: {},
       swaggerConfigDetail: null,
-      swaggerConfig: []
+      swaggerConfig: [],
+      activeIndex: 0
     }
   },
   mounted () {
@@ -58,6 +37,7 @@ export default {
   },
   methods: {
     getSwaggerApiData (swagger) {
+      this.$set(swagger, 'loading', true)
       http.get(swagger.apiUrl).then(res => {
         this.swaggerConfigDetail = res
         if (res.paths) {
@@ -73,7 +53,10 @@ export default {
               if (curItem) {
                 let requestCode = ''
                 // 取url最后一个字段当做方法名。注意排除pathParam
-                let funcName = key.split('/').filter(x => !x.startsWith('{')).pop()
+                let funcName = key
+                  .split('/')
+                  .filter(x => !x.startsWith('{'))
+                  .pop()
                 // 如果同一个链接有多个请求就在名字后面加上请求类型
                 if (mutipleRequest) {
                   funcName = `${funcName}_${type}`
@@ -115,7 +98,10 @@ export default {
                             ${haveQueryParams ? 'params: params' : ''}
                             ${haveBodyParams ? 'data: data' : ''}
                           }) 
-                      }`.split('\n').filter(x => x.trim().length > 0).join('\n')
+                      }`
+                    .split('\n')
+                    .filter(x => x.trim().length > 0)
+                    .join('\n')
                   // 去掉每一行前面的空格
                   requestCode = requestCode
                     .split('\n')
@@ -137,20 +123,9 @@ export default {
           this.$set(swagger, 'swaggerApiGroupList', _.groupBy(apiList, 'tag'))
           this.$set(swagger, 'swaggerApiList', apiList)
         }
+      }).finally(() => {
+        swagger.loading = false
       })
-    },
-    // 获取分组下的代码
-    mutipleCopyRequestCode (group) {
-      if (group.length > 0) {
-        let codes = group.map(item => item.requestCode).join('\n')
-        copy(codes)
-        this.$Message.success('拷贝成功')
-      }
-    },
-    // 单个拷贝
-    copyRequestCode (item) {
-      copy(item.requestCode)
-      this.$Message.success('复制成功')
     },
     changeSwaggerTab (index) {
       const curSwagger = this.swaggerConfig[index]
@@ -186,12 +161,18 @@ export default {
     height: calc(100vh - 150px);
     width: 100%;
     overflow: auto;
-    .swagger-website{
+    .swagger-website {
       margin-bottom: 10px;
-      strong{
+      strong {
         margin-right: 10px;
       }
     }
+  }
+  /deep/ .ivu-spin{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 }
 </style>
