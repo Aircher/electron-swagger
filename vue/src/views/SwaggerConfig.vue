@@ -9,7 +9,7 @@
       <div class="tip">swagger配置必须是有效的数组json字符串,包含apiUrl,swaggerWebsite,name三个字段且不能为空</div>
       <Input v-model="swaggerJson" :autosize="{ maxRows:10 }" type="textarea" placeholder />
     </Modal>
-    <Modal v-model="showAddModal" title="添加swagger配置" @on-ok="onSave">
+    <Modal v-model="showAddModal" title="添加swagger配置" @on-cancel="onModalCancel" @on-ok="onSave">
       <Form ref="addForm" autocomplete="off" :model="addForm" :label-width="120">
         <FormItem label="swagger地址" prop="swaggerWebsite">
           <Input type="text" v-model="addForm.swaggerWebsite" />
@@ -101,7 +101,7 @@ export default {
                   },
                   on: {
                     click: () => {
-                      this.addForm = params.row
+                      this.addForm = { ...params.row }
                       this.editFormIndex = params.index
                       this.showAddModal = true
                     }
@@ -155,7 +155,7 @@ export default {
       this.addForm = {}
       this.showAddModal = !this.showAddModal
     },
-    ...mapMutations('app', ['addSwaggerConfig']),
+    ...mapMutations('app', ['addSwaggerConfig', 'updateSingleSwaggerConfig']),
     onSave () {
       if (this.editFormIndex) {
         this.updateSingleSwaggerConfig({
@@ -167,6 +167,10 @@ export default {
         this.showAddModal = false
         this.addForm = {}
       }
+      this.editFormIndex = ''
+    },
+    onModalCancel () {
+      this.editFormIndex = ''
     }
   },
   watch: {

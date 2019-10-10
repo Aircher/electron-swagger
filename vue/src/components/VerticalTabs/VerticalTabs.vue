@@ -31,11 +31,14 @@ export default {
       this.tabs = this.$children.map(item => {
         return item.label
       })
+      this.$children[0].show = true
     })
   },
   methods: {
     onClick (index) {
       if (index !== this.activeIndex) {
+        this.$children[this.activeIndex].show = false
+        this.$children[index].show = true
         this.activeIndex = index
         this.$emit('on-change', index)
       }
@@ -71,6 +74,10 @@ export default {
         color: white;
       }
     }
+  }
+  .tab-panels{
+    flex: 1 auto;
+    padding: 0 20px;
   }
 }
 </style>
