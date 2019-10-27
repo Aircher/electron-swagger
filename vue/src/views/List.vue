@@ -62,32 +62,30 @@ export default {
                   funcName = `${funcName}_${type}`
                 }
                 curItem.parameters = curItem.parameters || []
-                if (curItem.parameters.findIndex(x => x.in === 'path')) {
-                  let requestParams = []
-                  let pathParams = curItem.parameters
-                    .filter(x => x.in === 'path')
-                    .map(x => x.name)
-                  let haveQueryParams =
+                let requestParams = []
+                let pathParams = curItem.parameters
+                  .filter(x => x.in === 'path')
+                  .map(x => x.name)
+                let haveQueryParams =
                     curItem.parameters.findIndex(x => x.in === 'query') >= 0
-                  let haveBodyParams =
+                let haveBodyParams =
                     curItem.parameters.findIndex(x => x.in === 'body') >= 0
-                  if (pathParams.length > 0) {
-                    requestParams.push(...pathParams)
-                  }
-                  if (haveQueryParams) {
-                    requestParams.push('params')
-                  }
-                  if (haveBodyParams) {
-                    requestParams.push('data')
-                  }
-
-                  // 默认链接就是key
-                  let requestUrl = `'${key}'`
-                  // 如果链接里面包含参数就是用字符串模板会将xxx/{sysno}转换成xxx/${sysno}
-                  if (pathParams.length > 0) {
-                    requestUrl = `\`${key.replace(/\/{/g, '/${')}\``
-                  }
-                  requestCode = `
+                if (pathParams.length > 0) {
+                  requestParams.push(...pathParams)
+                }
+                if (haveQueryParams) {
+                  requestParams.push('params')
+                }
+                if (haveBodyParams) {
+                  requestParams.push('data')
+                }
+                // 默认链接就是key
+                let requestUrl = `'${key}'`
+                // 如果链接里面包含参数就是用字符串模板会将xxx/{sysno}转换成xxx/${sysno}
+                if (pathParams.length > 0) {
+                  requestUrl = `\`${key.replace(/\/{/g, '/${')}\``
+                }
+                requestCode = `
                       ${curItem.summary ? '//' + curItem.summary : ''} 
                       export const ${funcName}= (${
   requestParams.length > 0 ? requestParams.join(',') : ''
@@ -99,17 +97,16 @@ export default {
                             ${haveBodyParams ? 'data: data' : ''}
                           }) 
                       }`
-                    .split('\n')
-                    .filter(x => x.trim().length > 0)
-                    .join('\n')
+                  .split('\n')
+                  .filter(x => x.trim().length > 0)
+                  .join('\n')
                   // 去掉每一行前面的空格
-                  requestCode = requestCode
-                    .split('\n')
-                    .map(item => {
-                      return item.replace('                     ', '')
-                    })
-                    .join('\n')
-                }
+                requestCode = requestCode
+                  .split('\n')
+                  .map(item => {
+                    return item.replace('                     ', '')
+                  })
+                  .join('\n')
                 apiList.push({
                   tag: path[type].tags[0],
                   url: key,
