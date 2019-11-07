@@ -108,7 +108,7 @@ export default {
                   })
                   .join('\n')
                 apiList.push({
-                  tag: path[type].tags[0],
+                  tag: this.getTagName(path[type].tags[0], res),
                   url: key,
                   type: type,
                   summary: path[type].summary,
@@ -123,6 +123,14 @@ export default {
       }).finally(() => {
         swagger.loading = false
       })
+    },
+    getTagName (tag, swagger) {
+      let curTag = swagger.tags.find(x => x.name === tag)
+      if (curTag) {
+        return `${curTag.name} ${curTag.description}`
+      } else {
+        return tag
+      }
     },
     changeSwaggerTab (index) {
       const curSwagger = this.swaggerConfig[index]
