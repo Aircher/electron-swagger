@@ -17,7 +17,9 @@
               {{item.url}} {{item.summary}}
               <Icon type="md-copy" @click.stop="copyRequestCode(item)" />
               <div slot="content">
-                <pre v-html="item.requestCode" class="code-content"></pre>
+                <pre class="code-content" v-highlight>
+                  <code class="javascript" v-html="item.requestCode"></code>
+                </pre>
               </div>
             </Panel>
           </Collapse>
